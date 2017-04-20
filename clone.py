@@ -2,14 +2,26 @@ import csv
 import cv2
 import numpy as np
 
-def read_image(source_path):
-	if '\\' in source_path:
+def read_image(imagePath):
+	if '\\' in imagePath:
 		delimiter = '\\'
 	else:
 		delimiter = '/'
-	filename = source_path.split(delimiter)[-1]
+	filename = imagePath.split(delimiter)[-1]
 	current_path = './data/IMG/' + filename
 	return cv2.imread(current_path)
+
+def process_image(images, measurements, imagePath, measurement, useAugmented):
+	image = read_image(imagePath)
+	images.append(image)
+	if useAugmented:
+		images.append(cv2.flip(image, 1))
+	if useMultipleCameras:
+		img_left = cv2
+
+	measurements.append(measurement)
+	if useAugmented:
+		measurements.append(-measurement)
 
 def load_data(useAugmented=False, useMultipleCameras=False):
 	images = []
@@ -17,21 +29,24 @@ def load_data(useAugmented=False, useMultipleCameras=False):
 	with open('./data/driving_log.csv') as csvfile:
 		reader = csv.reader(csvfile)
 		for line in reader:
-			source_path = line[0]
-			image = read_image(source_path)
-			images.append(image)
-			if useAugmented:
-				images.append(cv2.flip(image, 1))
-			if useMultipleCameras:
-				img_left = cv2
-
+			imagePath = line[0]
 			measurement = float(line[3])
-			measurements.append(measurement)
-			if useAugmented:
-				measurements.append(-measurement)
+			process_image(images, measurements, imagePath, measurement, useAugmented)
 
+			if useMultipleCameras:
+				correction = 0.2
+
+				leftImagePath = line[1]
+				measurementLeft = measurement + correction
+				process_image(images, measurements, leftImagePath, measurementLeft, useAugmented)
+
+				rightImagePath = line[1]
+				measurementRight = measurement - correction
+				process_image(images, measurements, rightImagePath, measurementRight, useAugmented)
 
 	return np.array(images),np.array(measurements)
+
+
 
 X_train, y_train = load_data(useAugmented=True, useMultipleCameras=True)
 
