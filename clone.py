@@ -2,32 +2,38 @@ import csv
 import cv2
 import numpy as np
 
-lines = []
-with open('./data/driving_log.csv') as csvfile:
-	reader = csv.reader(csvfile)
-	for line in reader:
-		lines.append(line)
-
-images = []
-measurements = []
-for line in lines:
-	source_path = line[0]
+def read_image(source_path):
 	if '\\' in source_path:
 		delimiter = '\\'
 	else:
 		delimiter = '/'
 	filename = source_path.split(delimiter)[-1]
 	current_path = './data/IMG/' + filename
-	image = cv2.imread(current_path)
-	images.append(image)
-	images.append(cv2.flip(image, 1))
+	return cv2.imread(current_path)
 
-	measurement = float(line[3])
-	measurements.append(measurement)
-	measurements.append(-measurement)
+def load_data(useAugmented=False, useMultipleCameras=False):
+	images = []
+	measurements = []
+	with open('./data/driving_log.csv') as csvfile:
+		reader = csv.reader(csvfile)
+		for line in reader:
+			source_path = line[0]
+			image = read_image(source_path)
+			images.append(image)
+			if useAugmented:
+				images.append(cv2.flip(image, 1))
+			if useMultipleCameras:
+				img_left = cv2
 
-X_train = np.array(images)
-y_train = np.array(measurements)
+			measurement = float(line[3])
+			measurements.append(measurement)
+			if useAugmented:
+				measurements.append(-measurement)
+
+
+	return np.array(images),np.array(measurements)
+
+X_train, y_train = load_data(useAugmented=True, useMultipleCameras=True)
 
 from keras.models import Sequential
 from keras.layers import Cropping2D, Flatten, Dense, Lambda, Convolution2D, MaxPooling2D, Dropout
