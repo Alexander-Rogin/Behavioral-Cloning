@@ -14,13 +14,10 @@ def read_image(imagePath):
 def process_image(images, measurements, imagePath, measurement, useAugmented):
 	image = read_image(imagePath)
 	images.append(image)
+	measurements.append(measurement)
+
 	if useAugmented:
 		images.append(cv2.flip(image, 1))
-	if useMultipleCameras:
-		img_left = cv2
-
-	measurements.append(measurement)
-	if useAugmented:
 		measurements.append(-measurement)
 
 def load_data(useAugmented=False, useMultipleCameras=False):
