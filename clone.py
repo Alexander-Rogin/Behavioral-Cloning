@@ -80,7 +80,7 @@ def generator(samples, batch_size=32, useAugmented=False, useMultipleCameras=Fal
 					images.append(cv2.flip(center_image, 1))
 					angles.append(-center_angle)
 
-			 	if useMultipleCameras:
+				if useMultipleCameras:
 					correction = 0.2
 
 					name = './IMG/'+batch_sample[1].split('/')[-1]
