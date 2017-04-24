@@ -46,7 +46,7 @@ def load_data(useAugmented=False, useMultipleCameras=False):
 
 
 
-X_train, y_train = load_data(useAugmented=True, useMultipleCameras=True)
+X_train, y_train = load_data(useAugmented=False, useMultipleCameras=True)
 
 from keras.models import Sequential
 from keras.layers import Cropping2D, Flatten, Dense, Lambda, Convolution2D, MaxPooling2D, Dropout
@@ -75,6 +75,6 @@ model.add(Dense(84))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=10)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=7)
 
 model.save('model.h5')
