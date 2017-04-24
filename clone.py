@@ -25,6 +25,7 @@ def load_data(useAugmented=False, useMultipleCameras=False):
 	measurements = []
 	with open('./data/driving_log.csv') as csvfile:
 		reader = csv.reader(csvfile)
+		next(reader, None)
 		for line in reader:
 			imagePath = line[0]
 			measurement = float(line[3])
@@ -74,6 +75,6 @@ model.add(Dense(84))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=15)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=10)
 
 model.save('model.h5')
