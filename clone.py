@@ -1,6 +1,7 @@
 import csv
 import cv2
 import numpy as np
+import random
 
 def read_image(imagePath):
 	if '\\' in imagePath:
@@ -13,12 +14,15 @@ def read_image(imagePath):
 
 def process_image(images, measurements, imagePath, measurement, useAugmented):
 	image = read_image(imagePath)
-	images.append(image)
-	measurements.append(measurement)
+#	images.append(image)
+#	measurements.append(measurement)
 
-	if useAugmented:
+	if useAugmented and random.randint(0, 1) == 1:
 		images.append(cv2.flip(image, 1))
 		measurements.append(-measurement)
+	else:
+		images.append(image)
+		measurements.append(measurement)
 
 def load_data(useAugmented=False, useMultipleCameras=False):
 	images = []
@@ -32,7 +36,7 @@ def load_data(useAugmented=False, useMultipleCameras=False):
 			process_image(images, measurements, imagePath, measurement, useAugmented)
 
 			if useMultipleCameras:
-				correction = 0.2
+				correction = 0.5
 
 				leftImagePath = line[1]
 				measurementLeft = measurement + correction
@@ -46,7 +50,7 @@ def load_data(useAugmented=False, useMultipleCameras=False):
 
 
 
-X_train, y_train = load_data(useAugmented=False, useMultipleCameras=True)
+X_train, y_train = load_data(useAugmented=True, useMultipleCameras=True)
 
 from keras.models import Sequential
 from keras.layers import Cropping2D, Flatten, Dense, Lambda, Convolution2D, MaxPooling2D, Dropout
@@ -75,6 +79,6 @@ model.add(Dense(84))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=7)
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=5)
 
 model.save('model.h5')
