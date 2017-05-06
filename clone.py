@@ -3,54 +3,6 @@ import cv2
 import numpy as np
 import random
 
-def read_image(imagePath):
-    if '\\' in imagePath:
-        delimiter = '\\'
-    else:
-        delimiter = '/'
-    filename = imagePath.split(delimiter)[-1]
-    current_path = './data/IMG/' + filename
-    return cv2.imread(current_path)
-
-
-def process_image(images, measurements, imagePath, measurement, useAugmented):
-    image = read_image(imagePath)
-
-    if useAugmented and random.randint(0, 1) == 1:
-        images.append(cv2.flip(image, 1))
-        measurements.append(-measurement)
-    else:
-        images.append(image)
-        measurements.append(measurement)
-
-def load_data(useAugmented=False, useMultipleCameras=False):
-    images = []
-    measurements = []
-    with open('./data/driving_log.csv') as csvfile:
-        reader = csv.reader(csvfile)
-        next(reader, None)
-        for line in reader:
-            imagePath = line[0]
-            measurement = float(line[3])
-            # if abs(measurement) <= 0.01:
-            #   continue
-            process_image(images, measurements, imagePath, measurement, useAugmented)
-
-            if useMultipleCameras:
-                correction = 0.35
-
-                leftImagePath = line[1]
-                measurementLeft = measurement + correction
-                process_image(images, measurements, leftImagePath, measurementLeft, useAugmented)
-
-                rightImagePath = line[1]
-                measurementRight = measurement - correction
-                process_image(images, measurements, rightImagePath, measurementRight, useAugmented)
-
-    return np.array(images),np.array(measurements)
-
-
-
 samples = []
 with open('./data/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
